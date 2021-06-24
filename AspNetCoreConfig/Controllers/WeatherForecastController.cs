@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AspNetCoreConfig.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -17,10 +19,12 @@ namespace AspNetCoreConfig.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly IConfiguration _configuration;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IConfiguration configuration)
         {
             _logger = logger;
+            _configuration = configuration;
         }
 
         [HttpGet]
@@ -35,5 +39,16 @@ namespace AspNetCoreConfig.Controllers
             })
             .ToArray();
         }
+
+        [HttpGet]
+        [Route("get settings")]
+        public Settings GetSettings()
+        {
+            var settings = new Settings();
+            _configuration.Bind(settings);
+            var chechecker = settings;
+            return settings;
+        }
+
     }
 }
