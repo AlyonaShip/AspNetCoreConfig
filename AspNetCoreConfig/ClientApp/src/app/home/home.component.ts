@@ -16,8 +16,13 @@ export class HomeComponent {
 
 export class Settings {
   environmentSettings: EnvironmentSettings;
+  allowedOrigins: AllowedOrigins
     }
 
 export class EnvironmentSettings {
   name: string;
-    }
+}
+
+export class AllowedOrigins {
+  link: Array<string>;
+}

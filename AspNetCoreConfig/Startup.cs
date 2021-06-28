@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Collections.Generic;
 
 namespace AspNetCoreConfig
 {
@@ -13,8 +14,8 @@ namespace AspNetCoreConfig
     {
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
-            var chechecker = environment;
-            Configuration = new ConfigurationBuilder().AddJsonFile($"appsettings.{environment.EnvironmentName}.json").Build();
+            var chechecker = environment;         
+            Configuration = new ConfigurationBuilder().AddJsonFile($"appsettings.{environment.EnvironmentName}.json").Build();            
         }
 
         public IConfiguration Configuration { get; }
