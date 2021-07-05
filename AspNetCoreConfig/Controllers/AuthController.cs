@@ -16,22 +16,29 @@ namespace AspNetCoreConfig.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private List<LoginModel> people = new List<LoginModel>
+        {
+            new LoginModel { UserName ="Tyler", Password="22222", Role = "Manager" },
+            new LoginModel { UserName ="Marla", Password="33333", Role = "Editor" }
+        };
+
         [HttpPost]
         [Route("login")]
         public IActionResult Login(LoginModel user)
-        {
+        {       
+            var identity = GetIdentity(user);
             if (user == null)
             {
                 return BadRequest("Invalide data");
             }
-            if (user.UserName == "johndoe" && user.Password == "12345")
+            if (identity != null)
             {
                 var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"));
                 var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
                 var tokenOptions = new JwtSecurityToken(
                     issuer: "https://localhost:44382",
                     audience: "https://localhost:44382",
-                    claims: new List<Claim>(),
+                    claims: identity.Claims,
                     expires: DateTime.Now.AddMinutes(5),
                     signingCredentials: signingCredentials
                     );
@@ -43,5 +50,23 @@ namespace AspNetCoreConfig.Controllers
                 return Unauthorized();
             }
         }
+
+        private ClaimsIdentity GetIdentity(LoginModel user)
+        {
+            LoginModel person = people.FirstOrDefault(p => p.UserName == user.UserName && p.Password == user.Password);
+            if(person != null)
+            {
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimsIdentity.DefaultNameClaimType, person.UserName),
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, person.Role)
+                };
+                ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+                return claimsIdentity;
+            }
+            return null;
+        }
+
+
     }
 }

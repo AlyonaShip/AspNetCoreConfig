@@ -18,5 +18,21 @@ namespace AspNetCoreConfig.Controllers
         {
             return new string[] { "First secred data string", "Second secred data string" };
         }
+
+        [HttpGet]
+        [Authorize(Roles = "Manager")]
+        [Route("manager-data")]
+        public IEnumerable<string> GetManagersData()
+        {
+            return new string[] { "GetManagersData()", "Manager Data" };
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Editor")]
+        [Route("editor-data")]
+        public IEnumerable<string> GetEditorsData()
+        {
+            return new string[] { "GetEditorsData()", "Editor Data" };
+        }       
     }
 }

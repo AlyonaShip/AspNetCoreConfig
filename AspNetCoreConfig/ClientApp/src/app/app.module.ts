@@ -12,6 +12,8 @@ import { FetchDataComponent } from './fetch-data/fetch-data.component';
 import { PrivateDataComponent } from './private-data/private-data.component';
 import { LoginComponent } from './login/login.component';
 import { JwtInterceptor } from '../app/jwt-interceptor';
+import { ManagerDataComponent } from './manager-data/manager-data.component';
+import { EditorDataComponent } from './editor-data/editor-data.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +23,9 @@ import { JwtInterceptor } from '../app/jwt-interceptor';
     CounterComponent,
     FetchDataComponent,
     PrivateDataComponent,
-    LoginComponent
+    LoginComponent,
+    ManagerDataComponent,
+    EditorDataComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -33,6 +37,8 @@ import { JwtInterceptor } from '../app/jwt-interceptor';
       { path: 'fetch-data', component: FetchDataComponent },
       { path: 'private-data', component: PrivateDataComponent },
       { path: 'login', component: LoginComponent },
+      { path: 'privatedata/manager-data', component: ManagerDataComponent },
+      { path: 'privatedata/editor-data', component: EditorDataComponent },
     ])
   ],
   providers: [
