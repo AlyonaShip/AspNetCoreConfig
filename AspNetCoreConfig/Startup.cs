@@ -10,6 +10,10 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using DataAccessLayer;
+using Microsoft.EntityFrameworkCore;
+using BusinessLayer.UserService;
+using DataAccessLayer.Entities;
 
 namespace AspNetCoreConfig
 {
@@ -25,6 +29,10 @@ namespace AspNetCoreConfig
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<ApplicationDbContext>(option =>
+            {
+                option.UseSqlServer(Configuration["SqlServerConnectioSrting"], b => b.MigrationsAssembly("DataAccessLayer"));
+            });
             services.AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -41,6 +49,9 @@ namespace AspNetCoreConfig
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"))
                 };            
             });
+
+            services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+            services.AddScoped<IUserService, UserService>();
 
 
             services.AddControllersWithViews();
@@ -76,6 +87,8 @@ namespace AspNetCoreConfig
             app.UseAuthentication();
             app.UseAuthorization();
 
+            SeedDefaultusers(app);
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -95,6 +108,39 @@ namespace AspNetCoreConfig
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
+        }
+
+        public void SeedDefaultusers(IApplicationBuilder app)
+        {
+            var scopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+
+            using (var scope = scopeFactory.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+                if (dbContext.Users.FirstOrDefaultAsync(u => u.FirstName == "John") == null)
+                {
+                    User johnDoe = new User
+                    {
+                        FirstName = "John",
+                        LastName = "Doe"
+                    };
+                    User tylerDurden = new User
+                    {
+                        FirstName = "Tyler",
+                        LastName = "Durden"
+                    };
+                    User marlaSinger = new User
+                    {
+                        FirstName = "Marla",
+                        LastName = "Singer"
+                    };
+                    dbContext.Users.Add(johnDoe);
+                    dbContext.Users.Add(tylerDurden);
+                    dbContext.Users.Add(marlaSinger);
+                    dbContext.SaveChanges();
+                }
+            }
         }
     }
 }
