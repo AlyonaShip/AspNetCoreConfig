@@ -3,14 +3,16 @@ using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210812065710_ComputerModelTagInfoAdded")]
+    partial class ComputerModelTagInfoAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,31 +94,7 @@ namespace DataAccessLayer.Migrations
                         .WithMany("ComputerModelTags")
                         .HasForeignKey("ComputerModelId");
 
-                    b.OwnsOne("DataAccessLayer.Entities.SalesInfo", "SalesInfo", b1 =>
-                        {
-                            b1.Property<string>("ComputerModelTagId")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<string>("DepartmentLocation")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("DepartmentZipCode")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("SalesDepartment")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("ComputerModelTagId");
-
-                            b1.ToTable("ComputerModelTags");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ComputerModelTagId");
-                        });
-
                     b.Navigation("ComputerModel");
-
-                    b.Navigation("SalesInfo");
                 });
 
             modelBuilder.Entity("DataAccessLayer.Entities.ComputerModel", b =>

@@ -14,6 +14,7 @@ using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using BusinessLayer.UserService;
 using DataAccessLayer.Entities;
+using System.Linq;
 
 namespace AspNetCoreConfig
 {
@@ -87,7 +88,7 @@ namespace AspNetCoreConfig
             app.UseAuthentication();
             app.UseAuthorization();
 
-            SeedDefaultusers(app);
+            SeedDefaultData(app);
 
             app.UseEndpoints(endpoints =>
             {
@@ -110,7 +111,7 @@ namespace AspNetCoreConfig
             });
         }
 
-        public void SeedDefaultusers(IApplicationBuilder app)
+        public void SeedDefaultData(IApplicationBuilder app)
         {
             var scopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
 
@@ -118,7 +119,7 @@ namespace AspNetCoreConfig
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-                if (dbContext.Users.FirstOrDefaultAsync(u => u.FirstName == "John") == null)
+                if (dbContext.Users.FirstOrDefault(u => u.FirstName == "John") == null)
                 {
                     User johnDoe = new User
                     {
@@ -140,6 +141,86 @@ namespace AspNetCoreConfig
                     dbContext.Users.Add(marlaSinger);
                     dbContext.SaveChanges();
                 }
+
+                if (dbContext.ComputerManufacturers.FirstOrDefault() == null)
+                {
+                    var computerManufacturerOne = new ComputerManufacturer
+                    {
+                        ManufacturerName = "Aser"
+                    };
+
+                    var computerManufacturerTwo = new ComputerManufacturer
+                    {
+                        ManufacturerName = "Toshiba"
+                    };
+
+                    dbContext.AddRange(computerManufacturerOne, computerManufacturerTwo);
+                    dbContext.SaveChanges();
+
+                    var computerModelAserOne = new ComputerModel
+                    {
+                        ModelName = "A1",
+                        ComputerManufacturerId = computerManufacturerOne.Id
+                    };
+
+                    var computerModelAserTwo = new ComputerModel
+                    {
+                        ModelName = "A2",
+                        ComputerManufacturerId = computerManufacturerOne.Id
+                    };
+
+                    var computerModelToshibaOne = new ComputerModel
+                    {
+                        ModelName = "Rapid",
+                        ComputerManufacturerId = computerManufacturerTwo.Id
+                    };
+
+                    var computerModelToshibaTwo = new ComputerModel
+                    {
+                        ModelName = "More fast",
+                        ComputerManufacturerId = computerManufacturerTwo.Id
+                    };
+
+                    dbContext.AddRange(computerModelAserOne, computerModelAserTwo, computerModelToshibaOne, computerModelToshibaTwo);
+                    dbContext.SaveChanges();
+
+                    //var asersTagOne = new ComputerModelTag
+                    //{
+                    //    TagName = "asersTagOne",
+                    //    TagMeta = "asersTagOne_Meta",
+                    //    TagExpiration = "4/6/2021",
+                    //    ComputerModelId = computerModelAserOne.Id
+                    //};
+
+                    //var asersTagTwo = new ComputerModelTag
+                    //{
+                    //    TagName = "asersTagTwo",
+                    //    TagMeta = "asersTagTwo_Meta",
+                    //    TagExpiration = "4/18/2021",
+                    //    ComputerModelId = computerModelAserOne.Id
+                    //};
+
+                    //var asersTagThree = new ComputerModelTag
+                    //{
+                    //    TagName = "asersTagThree",
+                    //    TagMeta = "asersTagThree_Meta",
+                    //    TagExpiration = "4/18/2025",
+                    //    ComputerModelId = computerModelAserOne.Id
+                    //};
+
+                    //var asersTagFour = new ComputerModelTag
+                    //{
+                    //    TagName = "asersTagFour",
+                    //    TagMeta = "asersTagFour_Meta",
+                    //    TagExpiration = "4/18/2030",
+                    //    ComputerModelId = computerModelAserOne.Id
+                    //};
+
+                    //dbContext.AddRange(asersTagOne, asersTagTwo, asersTagThree, asersTagFour);
+                    //dbContext.SaveChanges();
+                }
+
+                var compModelsTagsExpanded = dbContext.ComputerModelTags.ToList();
             }
         }
     }
