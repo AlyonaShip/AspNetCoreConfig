@@ -5,3 +5,10 @@
 <p aria-live="polite">Current count: <strong>{{ currentCount }}</strong></p>
 
 <button class="btn btn-primary" (click)="incrementCounter()">Increment</button>
+
+<div *ngIf="privateDataset">
+  <h1>Private dataset retrieved: </h1>
+  <p *ngFor="let user of privateDataset">
+    <span>First Name: <strong>{{user.firstName}}</strong>Last Name: <strong>{{user.lastName}}</strong></span>
+  </p>
+</div>

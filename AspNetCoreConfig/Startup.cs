@@ -1,8 +1,12 @@
 using AspNetCoreConfig.Models;
+using BusinessLayer.UserService;
+using DataAccessLayer;
+using DataAccessLayer.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -22,7 +26,13 @@ namespace AspNetCoreConfig
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {         
+        {
+            services.AddDbContext<ApplicationDbContext>(option => {
+                option.UseSqlServer(Configuration["SqlServerConnectionString"], b => b.MigrationsAssembly("DataAccessLayer"));
+            });
+
+            services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+            services.AddScoped<IUserService, UserService>();
             services.AddControllersWithViews();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -54,6 +64,8 @@ namespace AspNetCoreConfig
 
             app.UseRouting();
 
+            SeedDefaultUsers(app);
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -73,6 +85,39 @@ namespace AspNetCoreConfig
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
+        }
+
+        public void SeedDefaultUsers(IApplicationBuilder app)
+        {
+            var scopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+
+            using (var scope = scopeFactory.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                if( dbContext.Users.FirstOrDefaultAsync(u => u.FirstName == "John").Result == null)
+                {
+                    User johnDoe = new User
+                    {
+                        FirstName = "John",
+                        LastName = "Doe"
+                    };
+                    User tylerDurgen = new User
+                    {
+                        FirstName = "Tyler",
+                        LastName = "Durgen"
+                    };
+                    User marlaSinger = new User
+                    {
+                        FirstName = "Marla",
+                        LastName = "Singer"
+                    };
+                    dbContext.Users.Add(johnDoe);
+                    dbContext.Users.Add(tylerDurgen);
+                    dbContext.Users.Add(marlaSinger);
+                    dbContext.SaveChanges();
+
+                }
+            }
         }
     }
 }
