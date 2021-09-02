@@ -14,6 +14,7 @@ using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using BusinessLayer.UserService;
 using DataAccessLayer.Entities;
+using Microsoft.OpenApi.Models;
 
 namespace AspNetCoreConfig
 {
@@ -53,6 +54,10 @@ namespace AspNetCoreConfig
             services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
             services.AddScoped<IUserService, UserService>();
 
+            services.AddSwaggerGen(sw => 
+            {
+                sw.SwaggerDoc("v1", new OpenApiInfo { Title = "Swagger API", Version = "v1" });
+            });
 
             services.AddControllersWithViews();
             // In production, the Angular files will be served from this directory
@@ -68,6 +73,12 @@ namespace AspNetCoreConfig
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
+                app.UseSwagger();
+                app.UseSwaggerUI(sw => 
+                {
+                    sw.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
+                });
             }
             else
             {
