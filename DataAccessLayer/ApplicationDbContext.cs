@@ -13,7 +13,10 @@ namespace DataAccessLayer
         {
 
         }
-
+        public override int SaveChanges()
+        {
+            return base.SaveChanges();
+        }
         public DbSet<User> Users { get; set; }
     }
 }
