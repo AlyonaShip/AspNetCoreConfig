@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using BusinessLayer.UserService;
 using DataAccessLayer.Entities;
 using Microsoft.OpenApi.Models;
+using BusinessLayer.ComputerService;
 
 namespace AspNetCoreConfig
 {
@@ -53,6 +54,8 @@ namespace AspNetCoreConfig
 
             services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IComputerService, ComputerService>();
+
 
             services.AddSwaggerGen(sw => 
             {

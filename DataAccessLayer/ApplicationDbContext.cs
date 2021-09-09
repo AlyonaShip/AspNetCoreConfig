@@ -20,5 +20,7 @@ namespace DataAccessLayer
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<CompManufacturer> CompManufacturers { get; set; }
+        public DbSet<CompModel> CompModels { get; set; }
     }
 }
