@@ -1,5 +1,7 @@
-﻿using BusinessLayer.Models;
+﻿using BusinessLayer.ComputerService;
+using BusinessLayer.Models;
 using BusinessLayer.UserService;
+using DataAccessLayer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,9 +17,11 @@ namespace AspNetCoreConfig.Controllers
     public class PrivateDataController : ControllerBase
     {
         private readonly IUserService _userService;
-        public PrivateDataController(IUserService userService)
+        private readonly ComputerService _computerService;
+        public PrivateDataController(IUserService userService, IApplicationDbContext applicationDbContext)
         {
             _userService = userService;
+            _computerService = new ComputerService(applicationDbContext);
         }
 
         [HttpGet]
@@ -28,10 +32,11 @@ namespace AspNetCoreConfig.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        //[Authorize]
         [Route("get-users")]
         public List<User> GetAllUsers()
         {
+            var manufacturers = _computerService.GetComputerManufacturers();
             return _userService.GetAll();
         }
 

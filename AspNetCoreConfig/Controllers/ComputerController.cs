@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.ComputerService;
 using BusinessLayer.Models;
+using DataAccessLayer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -13,10 +14,10 @@ namespace AspNetCoreConfig.Controllers
     [ApiController]
     public class ComputerController : ControllerBase
     {
-        private readonly IComputerService _computerService;
-        public ComputerController(IComputerService computerService)
+        private readonly ComputerService _computerService;
+        public ComputerController(IApplicationDbContext applicationDbContext)
         {
-            _computerService = computerService;
+            _computerService = new ComputerService(applicationDbContext);
         }
 
         [HttpPost]
