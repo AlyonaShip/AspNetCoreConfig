@@ -1,4 +1,5 @@
-﻿using BusinessLayer.Models;
+﻿using AutoMapper;
+using BusinessLayer.Models;
 using DataAccessLayer;
 using DataAccessLayer.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -12,9 +13,14 @@ namespace BusinessLayer.ComputerService
     public class ComputerService : IComputerService
     {
         private readonly IApplicationDbContext _dbContext;
+        private readonly Mapper _autoMapper;
         public ComputerService(IApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
+            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<CompManufacturer, CompManufacturerDto>().ForMember(
+                dest => dest.CompModels, opt => opt.MapFrom(scr => scr.CompModels.Select(m => new CompModelDto { ModelName = m.ModelName}))                
+                ));
+            _autoMapper = new Mapper(mapperConfig);
         }
         public string AddManufacturer(CompManufacturerDto compManufacturer)
         {
@@ -51,18 +57,19 @@ namespace BusinessLayer.ComputerService
         public List<CompManufacturerDto> GetCompManufacturers()
         {
             var manufacturers = _dbContext.CompManufacturers.Include(c => c.CompModels).ToList();
-            var resultList = new List<CompManufacturerDto>();
-            foreach (var manufacturer in manufacturers)
-            {
-                resultList.Add(new CompManufacturerDto
-                {
-                    ManufacturerName = manufacturer.ManufacturerName,
-                    CompModels = manufacturer?.CompModels?.Select(model => new CompModelDto
-                    {
-                        ModelName = model.ModelName
-                    }).ToList()
-                });
-            }
+            var resultList = _autoMapper.Map<List<CompManufacturer>, List<CompManufacturerDto>>(manufacturers);
+            //var resultList = new List<CompManufacturerDto>();
+            //foreach (var manufacturer in manufacturers)
+            //{
+            //    resultList.Add(new CompManufacturerDto
+            //    {
+            //        ManufacturerName = manufacturer.ManufacturerName,
+            //        CompModels = manufacturer?.CompModels?.Select(model => new CompModelDto
+            //        {
+            //            ModelName = model.ModelName
+            //        }).ToList()
+            //    });
+            //}
             return resultList;
         }
     }
