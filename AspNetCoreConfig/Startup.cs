@@ -16,6 +16,8 @@ using BusinessLayer.UserService;
 using DataAccessLayer.Entities;
 using Microsoft.OpenApi.Models;
 using BusinessLayer.ComputerService;
+using Microsoft.Extensions.Logging;
+using BusinessLayer.Lifecycle;
 
 namespace AspNetCoreConfig
 {
@@ -52,9 +54,17 @@ namespace AspNetCoreConfig
                 };            
             });
 
+            var serviceProvider = services.BuildServiceProvider();
+            var logger = serviceProvider.GetService<ILogger<object>>();
+            services.AddSingleton(typeof(ILogger), logger);
+
             services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IComputerService, ComputerService>();
+
+            services.AddScoped<IScoped, LifecycleService>();
+            services.AddTransient<ITransient, LifecycleService>();
+            services.AddSingleton<ISingleton, LifecycleService>();
 
 
             services.AddSwaggerGen(sw => 

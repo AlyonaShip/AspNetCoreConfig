@@ -1,6 +1,9 @@
 ﻿using AspNetCoreConfig.Models;
+using BusinessLayer.ComputerService;
+using DataAccessLayer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -16,6 +19,13 @@ namespace AspNetCoreConfig.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private readonly IComputerService _computerService;
+
+        public AuthController(IComputerService computerService)
+        {
+            _computerService = computerService;
+        }
+
         private List<LoginModel> people = new List<LoginModel>
         {
             new LoginModel { UserName ="Tyler", Password="22222", Role = "Manager" },
@@ -25,7 +35,8 @@ namespace AspNetCoreConfig.Controllers
         [HttpPost]
         [Route("login")]
         public IActionResult Login(LoginModel user)
-        {       
+        {
+            var manufacturers = _computerService.GetCompManufacturers();
             var identity = GetIdentity(user);
             if (user == null)
             {
