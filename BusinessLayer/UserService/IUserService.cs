@@ -12,6 +12,7 @@ namespace BusinessLayer.UserService
         User AddUser(User user);
         User EditUser(User user);
         bool Delete(string id);
+        User FindByName(string userName);
 
     }
 }

@@ -1,3 +1,15 @@
+<div>
+  <h3>Type user name to be found</h3>
+  <input [(ngModel)] = "userNameToSearch"/>
+  <button (click)="search()">Search</button>
+
+  <ng-container *ngIf="userFound">
+    <h3>User Found: </h3>
+    <span>First Name: <strong>{{userFound.firstName}}</strong>Last Name: <strong>{{userFound.lastName}}</strong></span>
+  </ng-container>
+</div>
+
+
 <div *ngIf="privateDataset">
   <h1>Private dataset retrieved: </h1>
   <p *ngFor="let user of privateDataset">

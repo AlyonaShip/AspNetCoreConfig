@@ -16,6 +16,7 @@ using BusinessLayer.UserService;
 using DataAccessLayer.Entities;
 using Microsoft.OpenApi.Models;
 using BusinessLayer.ComputerService;
+using System.Linq;
 
 namespace AspNetCoreConfig
 {
@@ -132,28 +133,48 @@ namespace AspNetCoreConfig
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-                if (dbContext.Users.FirstOrDefaultAsync(u => u.FirstName == "John") == null)
+                //if (dbContext.Users.FirstOrDefaultAsync(u => u.FirstName == "John") == null)
+                //{
+                //    User johnDoe = new User
+                //    {
+                //        FirstName = "John",
+                //        LastName = "Doe"
+                //    };
+                //    User tylerDurden = new User
+                //    {
+                //        FirstName = "Tyler",
+                //        LastName = "Durden"
+                //    };
+                //    User marlaSinger = new User
+                //    {
+                //        FirstName = "Marla",
+                //        LastName = "Singer"
+                //    };
+                //    dbContext.Users.Add(johnDoe);
+                //    dbContext.Users.Add(tylerDurden);
+                //    dbContext.Users.Add(marlaSinger);
+                //    dbContext.SaveChanges();
+                //}
+
+                if(dbContext.Users.FirstOrDefault(u => u.FirstName == "John_1") == null)
                 {
-                    User johnDoe = new User
+                    for (int i = 0; i < 100000; i++)
                     {
-                        FirstName = "John",
-                        LastName = "Doe"
-                    };
-                    User tylerDurden = new User
-                    {
-                        FirstName = "Tyler",
-                        LastName = "Durden"
-                    };
-                    User marlaSinger = new User
-                    {
-                        FirstName = "Marla",
-                        LastName = "Singer"
-                    };
-                    dbContext.Users.Add(johnDoe);
-                    dbContext.Users.Add(tylerDurden);
-                    dbContext.Users.Add(marlaSinger);
-                    dbContext.SaveChanges();
+                        var johnDoe = new User
+                        {
+                            FirstName = $"John_{i}",
+                            LastName = $"Doe_{i}"
+                        };
+                        var samSmith = new User
+                        {
+                            FirstName = $"Sam_{i}",
+                            LastName = $"Smith_{i}"
+                        };
+                        dbContext.AddRange(johnDoe, samSmith);
+                    }
                 }
+
+                dbContext.SaveChanges();
             }
         }
     }
