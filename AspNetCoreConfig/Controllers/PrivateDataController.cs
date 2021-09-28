@@ -28,11 +28,19 @@ namespace AspNetCoreConfig.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        //[Authorize]
         [Route("get-users")]
         public List<User> GetAllUsers()
         {
             return _userService.GetAll();
+        }
+
+        [HttpGet]
+        //[Authorize]
+        [Route("find-user/{userName}")]
+        public User FindUser(string userName)
+        {
+            return _userService.FindByName(userName);
         }
 
         [HttpGet]

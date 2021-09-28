@@ -1,7 +1,9 @@
 ﻿using BusinessLayer.Models;
 using DataAccessLayer;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -10,9 +12,11 @@ namespace BusinessLayer.UserService
     public class UserService : IUserService
     {
         private IApplicationDbContext _dbContext;
+        private readonly SqlConnection _sqlConn;
         public UserService(IApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
+            _sqlConn = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB; database=UserInfo; Integrated Security=True");
         }
 
         public User AddUser(User user)
@@ -59,9 +63,58 @@ namespace BusinessLayer.UserService
             }
         }
 
+        public User FindByName(string userName)
+        {
+            var stopWatchStoreProc = new Stopwatch();
+            var stopwatchLinq = new Stopwatch();
+            double elapsedSP = 0, elapsedLinq = 0;
+            var cmd = new SqlCommand("FindUser", _sqlConn) {
+                CommandType = System.Data.CommandType.StoredProcedure
+            };
+
+            cmd.Parameters.AddWithValue("@NameToSearch", userName);
+
+            stopWatchStoreProc.Start();
+            _sqlConn.Open();
+            SqlDataReader dr = cmd.ExecuteReader();
+            List<User> users = new List<User>();
+            while (dr.Read())
+            {
+                users.Add(new User { 
+                FirstName = dr.GetString(1),
+                LastName = dr.GetString(2)
+                });
+            }
+            stopWatchStoreProc.Stop();
+            elapsedSP = stopWatchStoreProc.Elapsed.TotalMilliseconds;
+
+            _sqlConn.Close();
+
+            stopwatchLinq.Start();
+            var userViaLinq = _dbContext.Users.Where(u => u.FirstName == userName).ToList();
+            stopwatchLinq.Stop();
+            elapsedLinq = stopwatchLinq.Elapsed.Milliseconds;
+
+            var firstUser = userViaLinq.FirstOrDefault();
+
+            return new User { FirstName = firstUser.FirstName, LastName = firstUser.LastName};
+
+
+
+        }
+
         public List<User> GetAll()
         {
-            var users = _dbContext.Users.ToList();
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+            var users = _dbContext.Users.Where(u => (u.FirstName.StartsWith("John_1111") 
+            || u.FirstName.StartsWith("Sam_1111")) 
+            && (u.LastName.StartsWith("Doe_1111") 
+            || u.LastName.StartsWith("Smith_1111"))).OrderBy(u => u.FirstName).ToList();
+            stopWatch.Stop();
+            var elapsedTime = stopWatch.Elapsed.TotalMilliseconds;
+
+            //8618
             var userResult = new List<User>();
             foreach (var user in users)
             {
